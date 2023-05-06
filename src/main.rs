@@ -1,5 +1,6 @@
 mod cat;
 mod ls;
+mod clipboard;
 mod utils;
 use clap::Parser;
 
@@ -15,6 +16,8 @@ fn main() {
     match args.execute.as_str() {
         "cat" => cat::run(args.rest),
         "ls" => ls::run(args.rest),
+        "clip" => clipboard::clip(args.rest),
+        "paste" => clipboard::paste(args.rest),
         _ => panic!("Program required !"),
     }
 }
