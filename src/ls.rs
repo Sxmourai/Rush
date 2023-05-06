@@ -1,7 +1,6 @@
-use std::{io::{ErrorKind, Write}, fs::DirEntry};
+use std::io::Write;
 use clap::Parser;
-use crossterm::{*, event::*};
-use crate::utils::*;
+use crate::utils::error;
 
 #[derive(Parser, Debug)]
 struct Args {

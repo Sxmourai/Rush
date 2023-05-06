@@ -1,7 +1,6 @@
 mod cat;
 mod ls;
 mod utils;
-use utils::*;
 use clap::Parser;
 
 
