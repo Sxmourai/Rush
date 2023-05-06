@@ -20,4 +20,6 @@ pub fn clip(args:Vec<String>) {
 }
 
 pub fn paste(_args:Vec<String>) {
+    let file = std::fs::read_dir("\\\\?\\B:\\Documents\\Code\\Projets\\Rush").unwrap();
+    println!("{:?}", file);
 }
