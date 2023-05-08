@@ -1,67 +1,46 @@
 use std::{env, io};
+use std::env::current_dir;
 use std::path::PathBuf;
-use std::fs::{File, read, copy};
-use std::io::{BufRead, BufReader, Write};
+use std::fs::{copy, File, read_to_string};
+use std::io::{BufRead, BufReader, Read, Write};
+use crossterm::style::Stylize;
 
 pub fn clip(args:Vec<String>) {
-    // Assuming the file path is passed as the first command-line argument
     let file_path = &args[0];
 
-    // Get the current directory
     let current_dir = env::current_dir().expect("Failed to get current directory!");
 
-    // Create a PathBuf from the provided file path
     let path = PathBuf::from(file_path);
 
-    // Get the absolute path by joining the current directory and the file path
     let absolute_path = current_dir.join(path);
 
-    // Convert the absolute path to a String
     let absolute_path_str = absolute_path.to_str().expect("Failed to convert path to string!");
 
-    // Print the absolute path
     println!("Absolute path: {}", absolute_path_str);
 
-    // Get the system's temporary directory
     let temp_dir = env::temp_dir();
 
-    // Create a temporary file in the temporary directory
     let temp_file = temp_dir.join("rush-clipboard");
 
-    // Open the file for writing
     let mut file = File::create(&temp_file).expect("Failed to create temp file");
 
-    // Get the absolute path
-    // let absolute_path = env::current_exe().expect("Failed to get current executable path");
+git
+    file.write(absolute_path_str.as_bytes())
+        .expect(&format!("{} Failed to copy this file", "Error".bold().red()));
 
-    // Write the absolute path to the temporary file
-    file.write_all(absolute_path.to_string_lossy().as_bytes())
-        .expect("Failed to write to temp file");
-
-    // Print the path of the temporary file
-    println!("Temporary file path: {:?}", temp_file);
+    println!("{} file copied to the clipboard", "Success".bold().green());
 
 }
 
 pub fn paste(_args:Vec<String>)  {
-    // Define the source and destination paths
-    let clipboard_history_file = File::open(env::temp_dir().join("rush-clipboard")).unwrap();
-    let buffer_reader = BufReader::new(clipboard_history_file);
+    let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect("Failed to read file.");
+    let lines: Vec<&str> = file_string.lines().collect();
+    let source_path= lines.last().unwrap();
+    let destination_path = current_dir().unwrap().join(source_path.split('/').last().unwrap());
 
-    // Read the lines of the buffer into a vector
-    let lines: Vec<String> = buffer_reader.buffer().lines().map(|line| line.unwrap()).collect();
-    println!("{:?}",lines);
-    // get last line
-    let mut source_path=lines.last().unwrap();
-
-    println!("Source path is{}",source_path);
-
-    let destination_path = ".";
-
-    // Copy the file from the source path to the destination path
-    match copy(source_path, destination_path) {
-        Ok(_) =>  println!("File copied successfully!") ,
-        Err(e) => println!("Failed to copy file: {}", e),
+    match copy(source_path, destination_path.to_str().unwrap()) {
+        Ok(_) =>  println!("{} File copied successfully!", "Success".bold().green()) ,
+        Err(e) => println!("{} Failed to copy file", "Error".bold().red() ),
     };
 
 }

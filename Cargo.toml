@@ -7,3 +7,4 @@ edition = "2021"
 [dependencies]
 crossterm = "0.26.1"
 clap = {version = "4.1.8", features = ["derive"]}
+text-colorizer = "1"
