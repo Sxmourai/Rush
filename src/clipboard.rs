@@ -1,8 +1,8 @@
-use std::{env, io};
+use std::env;
 use std::env::current_dir;
 use std::path::PathBuf;
 use std::fs::{copy, File, read_to_string};
-use std::io::{BufRead, BufReader, Read, Write};
+use std::io::Write;
 use crossterm::style::Stylize;
 
 pub fn clip(args:Vec<String>) {
@@ -16,8 +16,6 @@ pub fn clip(args:Vec<String>) {
 
     let absolute_path_str = absolute_path.to_str().expect("Failed to convert path to string!");
 
-    println!("Absolute path: {}", absolute_path_str);
-
     let temp_dir = env::temp_dir();
 
     let temp_file = temp_dir.join("rush-clipboard");
@@ -27,19 +25,20 @@ pub fn clip(args:Vec<String>) {
     file.write(absolute_path_str.as_bytes())
         .expect(&format!("{} Failed to copy this file", "Error".bold().red()));
 
-    println!("{} file copied to the clipboard", "Success".bold().green());
+    println!("{}, copied {} to the clipboard", "Success".bold().green(), absolute_path_str.bold());
 
 }
 
-pub fn paste(_args:Vec<String>)  {
-    let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect("Failed to read file.");
+pub fn paste(args:Vec<String>)  {
+    let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect(format!("{}: Nothing to paste", "Error".bold().red()).as_str());
     let lines: Vec<&str> = file_string.lines().collect();
-    let source_path= lines.last().unwrap();
-    let destination_path = current_dir().unwrap().join(source_path.split('/').last().unwrap());
+    let source_abs_path= lines.last().unwrap();
+    // If the user specifies a new name for the pasted file
+    let dest_name = if args.len() > 0 {args[0].as_str()} else {source_abs_path.split('/').last().unwrap()};
+    let destination_path = current_dir().unwrap().join(dest_name);
 
-    match copy(source_path, destination_path.to_str().unwrap()) {
+    match copy(source_abs_path, destination_path.to_str().unwrap()) {
         Ok(_) =>  println!("{} File copied successfully!", "Success".bold().green()) ,
-        Err(e) => println!("{} Failed to copy file", "Error".bold().red() ),
+        Err(e) => println!("{}: Failed to copy {} to {:?} ({})", "Error".bold().red(), source_abs_path, destination_path, e),
     };
-
 }
