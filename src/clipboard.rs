@@ -24,7 +24,6 @@ pub fn clip(args:Vec<String>) {
 
     let mut file = File::create(&temp_file).expect("Failed to create temp file");
 
-git
     file.write(absolute_path_str.as_bytes())
         .expect(&format!("{} Failed to copy this file", "Error".bold().red()));
 
