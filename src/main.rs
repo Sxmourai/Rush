@@ -18,6 +18,7 @@ fn main() {
         "ls" => ls::run(args.rest),
         "clip" => clipboard::clip(args.rest),
         "paste" => clipboard::paste(args.rest),
+        "history" => clipboard::history(),
         _ => panic!("Program required !"),
     }
 }

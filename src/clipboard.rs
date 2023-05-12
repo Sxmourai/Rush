@@ -41,4 +41,14 @@ pub fn paste(args:Vec<String>)  {
         Ok(_) =>  println!("{} File copied successfully!", "Success".bold().green()) ,
         Err(e) => println!("{}: Failed to copy {} to {:?} ({})", "Error".bold().red(), source_abs_path, destination_path, e),
     };
+
+}
+
+pub fn history() {
+    let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect("Failed to read file.");
+    let lines: Vec<&str> = file_string.lines().collect();
+    println!("{} stores the following:","Rush - Clipboard".bold().green());
+    for line in lines {
+        println!("{}",line);
+    }
 }
