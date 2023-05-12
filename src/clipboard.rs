@@ -5,7 +5,7 @@ use std::fs::{copy, File, read_to_string};
 use std::io::Write;
 use crossterm::style::Stylize;
 
-pub fn clip(args:Vec<String>) {
+pub fn clip(args: Vec<String>) {
     let file_path = &args[0];
 
     let current_dir = env::current_dir().expect("Failed to get current directory!");
@@ -26,35 +26,39 @@ pub fn clip(args:Vec<String>) {
         .expect(&format!("{} Failed to copy this file", "Error".bold().red()));
 
     println!("{}, copied {} to the clipboard", "Success".bold().green(), absolute_path_str.bold());
-
 }
 
-pub fn paste(args:Vec<String>)  {
+pub fn paste(args: Vec<String>) {
     let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect(format!("{}: Nothing to paste", "Error".bold().red()).as_str());
     let lines: Vec<&str> = file_string.lines().collect();
-    let source_abs_path= lines.last().unwrap();
+    let source_abs_path = lines.last().unwrap();
     // If the user specifies a new name for the pasted file
-    let dest_name = if args.len() > 0 {args[0].as_str()} else {source_abs_path.split('/').last().unwrap()};
+    let dest_name = if args.len() > 0 { args[0].as_str() } else { source_abs_path.split('/').last().unwrap() };
     let destination_path = current_dir().unwrap().join(dest_name);
 
     match copy(source_abs_path, destination_path.to_str().unwrap()) {
-        Ok(_) =>  println!("{} File copied successfully!", "Success".bold().green()) ,
+        Ok(_) => println!("{} File copied successfully!", "Success".bold().green()),
         Err(e) => println!("{}: Failed to copy {} to {:?} ({})", "Error".bold().red(), source_abs_path, destination_path, e),
     };
-
 }
 
 pub fn history() {
     let file_string = match read_to_string(env::temp_dir().join("rush-clipboard")) {
         Ok(file) => file,
         Err(e) => match e.kind() {
-            std::io::ErrorKind::NotFound => {println!("You have no history file\nMost probably, you have never copied anything"); return},
-            _ => {println!("Error reading history file.");return},
+            std::io::ErrorKind::NotFound => {
+                println!("You have no history file\nMost probably, you have never copied anything");
+                return;
+            }
+            _ => {
+                println!("Error reading history file.");
+                return;
+            }
         }
     };
     let lines: Vec<&str> = file_string.lines().collect();
-    println!("{} stores the following:","Rush - Clipboard".bold().green());
+    println!("{} stores the following:", "Rush - Clipboard".bold().green());
     for line in lines {
-        println!("{}",line);
+        println!("{}", line);
     }
 }
