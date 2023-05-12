@@ -45,7 +45,13 @@ pub fn paste(args:Vec<String>)  {
 }
 
 pub fn history() {
-    let file_string = read_to_string(env::temp_dir().join("rush-clipboard")).expect("Failed to read file.");
+    let file_string = match read_to_string(env::temp_dir().join("rush-clipboard")) {
+        Ok(file) => file,
+        Err(e) => match e.kind() {
+            std::io::ErrorKind::NotFound => {println!("You have no history file\nMost probably, you have never copied anything"); return},
+            _ => {println!("Error reading history file.");return},
+        }
+    };
     let lines: Vec<&str> = file_string.lines().collect();
     println!("{} stores the following:","Rush - Clipboard".bold().green());
     for line in lines {
